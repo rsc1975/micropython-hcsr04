@@ -3,7 +3,7 @@
 Micropython driver for the well-known untrasonic sensor [HC-SR04](http://www.micropik.com/PDF/HCSR04.pdf)
 
 The driver has been tested on Wemos D1 mini PRO, but It should work on whatever other micropython board, 
-if anyone find problems in other boards, please open an issue and We'll see.
+if anyone find problems in other boards, please open an issue and we'll see.
 
 ##Motivation
 
@@ -38,8 +38,8 @@ distance = sensor.distance_mm()
 
 print('Distance:', distance, 'mm')
 ```
-
-We can also define a different timeout, passing the new value in microseconds to the constructor
+The default timeout is based on the sensor limit (4m), but we can also define a different timeout, 
+passing the new value in microseconds to the constructor.
 
 ```python
 from hcsr04 import HCSR04
