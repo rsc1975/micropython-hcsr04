@@ -24,7 +24,7 @@ class HCSR04:
         self.echo_timeout_us = echo_timeout_us
         # Init trigger pin (out)
         self.trigger = Pin(trigger_pin, mode=Pin.OUT, pull=None)
-        self.trigger.low()
+        self.trigger.value(0)
 
         # Init echo pin (in)
         self.echo = Pin(echo_pin, mode=Pin.IN, pull=None)
@@ -34,12 +34,12 @@ class HCSR04:
         Send the pulse to trigger and listen on echo pin.
         We use the method `machine.time_pulse_us()` to get the microseconds until the echo is received.
         """
-        self.trigger.low() # Stabilize the sensor
+        self.trigger.value(0) # Stabilize the sensor
         time.sleep_us(5)
-        self.trigger.high()
+        self.trigger.value(1)
         # Send a 10us pulse.
         time.sleep_us(10)
-        self.trigger.low()
+        self.trigger.value(0)
         try:
             pulse_time = machine.time_pulse_us(self.echo, 1, self.echo_timeout_us)
             return pulse_time
