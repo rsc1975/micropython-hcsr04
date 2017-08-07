@@ -13,9 +13,8 @@ class HCSR04:
     The timeouts received listening to echo pin are converted to OSError('Out of range')
 
     """
-    # Timeout is based in chip range limit (400cm)
-    TIMEOUT_US = 500*2*30
-    def __init__(self, trigger_pin, echo_pin, echo_timeout_us=HCSR04.TIMEOUT_US):
+    # echo_timeout_us is based in chip range limit (400cm)
+    def __init__(self, trigger_pin, echo_pin, echo_timeout_us=500*2*30):
         """
         trigger_pin: Output pin to send pulses
         echo_pin: Readonly pin to measure the distance. The pin should be protected with 1k resistor
