@@ -1,7 +1,7 @@
 import machine, time
 from math import sqrt
 
-__version__ = '0.2.0'
+__version__ = '1.0.0'
 __author__ = 'Roberto Sánchez'
 __license__ = "Apache License 2.0. https://www.apache.org/licenses/LICENSE-2.0"
 
