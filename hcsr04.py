@@ -1,5 +1,5 @@
 import machine, time
-from machine import Pin
+from math import sqrt
 
 __version__ = '0.2.0'
 __author__ = 'Roberto Sánchez'
@@ -14,20 +14,51 @@ class HCSR04:
 
     """
     # echo_timeout_us is based in chip range limit (400cm)
-    def __init__(self, trigger_pin, echo_pin, echo_timeout_us=500*2*30):
+    # air_temp is the temperature of the air. It is setted by default to 20°C
+    # air_temp must be defined in order to calculate the speed of sound in the air. It must be passed in Celsius
+    def __init__(self, trigger_pin, echo_pin, echo_timeout_us=500*2*30, air_temp=20):
         """
         trigger_pin: Output pin to send pulses
         echo_pin: Readonly pin to measure the distance. The pin should be protected with 1k resistor
         echo_timeout_us: Timeout in microseconds to listen to echo pin. 
         By default is based in sensor limit range (4m)
         """
+        # the working temperature of the sensor is between -15°C and 70°C according to the datasheet
+        self.max_working_temp = 70
+        self.min_working_temp = -15
+        
+        # speed of sound in the air depends by the temperature of air
+        # so first is checked if the air temp is in the working range of the sensor, then will be calculated the speed of sound
+        # speed of sound is needed to calculate the distance from the sensor to the object (formula is distance = speed of sound/time)
+        self.air_temperature = self._check_air_temp(air_temp)
+        self.sound_speed = self._get_sound_speed()
+
         self.echo_timeout_us = echo_timeout_us
         # Init trigger pin (out)
-        self.trigger = Pin(trigger_pin, mode=Pin.OUT, pull=None)
+        self.trigger = machine.Pin(trigger_pin, mode=machine.Pin.OUT, pull=None)
         self.trigger.value(0)
 
         # Init echo pin (in)
-        self.echo = Pin(echo_pin, mode=Pin.IN, pull=None)
+        self.echo = machine.Pin(echo_pin, mode=machine.Pin.IN, pull=None)
+
+    # NOT SURE ABOUT THIS, BETTER IF RAISED AN EXCEPTION
+    def _check_air_temp(self, temperature):
+        """
+        Check if air temp is in the working range of the sensor
+        """
+        if self.min_working_temp <= temperature <= self.max_working_temp:
+            return temperature
+        else:
+            print("Temperature is out of working range")
+
+    def _get_sound_speed(self):
+        """
+        Calculate speed of sound in the air (which depends by air temperature)
+        and divide for 1000 in order to convert the speed from m/s to mm/microseconds
+        """
+        ss = 20.05*(sqrt(self.air_temperature+273.15))
+        ss = ss / 1000 # conversion from meters / seconds in millimeters / microseconds
+        return ss
 
     def _send_pulse_and_wait(self):
         """
@@ -53,13 +84,7 @@ class HCSR04:
         Get the distance in milimeters without floating point operations.
         """
         pulse_time = self._send_pulse_and_wait()
-
-        # To calculate the distance we get the pulse_time and divide it by 2 
-        # (the pulse walk the distance twice) and by 29.1 becasue
-        # the sound speed on air (343.2 m/s), that It's equivalent to
-        # 0.34320 mm/us that is 1mm each 2.91us
-        # pulse_time // 2 // 2.91 -> pulse_time // 5.82 -> pulse_time * 100 // 582 
-        mm = pulse_time * 100 // 582
+        mm = (self.sound_speed * pulse_time) / 2
         return mm
 
     def distance_cm(self):
@@ -67,12 +92,8 @@ class HCSR04:
         Get the distance in centimeters with floating point operations.
         It returns a float
         """
-        pulse_time = self._send_pulse_and_wait()
-
-        # To calculate the distance we get the pulse_time and divide it by 2 
-        # (the pulse walk the distance twice) and by 29.1 becasue
-        # the sound speed on air (343.2 m/s), that It's equivalent to
-        # 0.034320 cm/us that is 1cm each 29.1us
-        cms = (pulse_time / 2) / 29.1
-        return cms
+        mm = self.distance_mm()
+        cm = mm / 10
+        cm = float("{0:.2f}".format(cm))
+        return cm
 
