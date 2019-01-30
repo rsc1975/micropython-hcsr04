@@ -1,6 +1,6 @@
 # HC-SR04 Sensor driver in micropython
 
-Micropython driver for the well-known untrasonic sensor [HC-SR04](http://www.micropik.com/PDF/HCSR04.pdf)
+Micropython driver for the well-known untrasonic sensor [HC-SR04](https://www.mpja.com/download/hc-sr04_ultrasonic_module_user_guidejohn.pdf)
 
 The driver has been tested on Wemos D1 mini PRO, but It should work on whatever other micropython board, 
 if anyone find problems in other boards, please open an issue and we'll see.
