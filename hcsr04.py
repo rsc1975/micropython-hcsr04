@@ -1,7 +1,7 @@
-import machine, time
-from machine import Pin
+from machine import Pin, time_pulse_us
+from utime import sleep_us
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Roberto Sánchez'
 __license__ = "Apache License 2.0. https://www.apache.org/licenses/LICENSE-2.0"
 
@@ -35,13 +35,13 @@ class HCSR04:
         We use the method `machine.time_pulse_us()` to get the microseconds until the echo is received.
         """
         self.trigger.value(0) # Stabilize the sensor
-        time.sleep_us(5)
+        sleep_us(5)
         self.trigger.value(1)
         # Send a 10us pulse.
-        time.sleep_us(10)
+        sleep_us(10)
         self.trigger.value(0)
         try:
-            pulse_time = machine.time_pulse_us(self.echo, 1, self.echo_timeout_us)
+            pulse_time = time_pulse_us(self.echo, 1, self.echo_timeout_us)
             return pulse_time
         except OSError as ex:
             if ex.args[0] == 110: # 110 = ETIMEDOUT
@@ -75,4 +75,3 @@ class HCSR04:
         # 0.034320 cm/us that is 1cm each 29.1us
         cms = (pulse_time / 2) / 29.1
         return cms
-
