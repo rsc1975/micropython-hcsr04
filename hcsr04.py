@@ -47,7 +47,6 @@ class HCSR04:
             if pulse_time < 0:
                 MAX_RANGE_IN_CM = const(500) # it's really ~400 but I've read people say they see it working up to ~460
                 pulse_time = int(MAX_RANGE_IN_CM * 29.1) # 1cm each 29.1us
-                print("pulse time adjusted to:" + str(pulse_time))
             return pulse_time
         except OSError as ex:
             if ex.args[0] == 110: # 110 = ETIMEDOUT
