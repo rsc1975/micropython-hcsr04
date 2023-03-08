@@ -67,3 +67,7 @@ except OSError as ex:
     print('ERROR getting distance:', ex)
 
 ```
+
+### Troubleshooting
+
+Not all HC-SR04 modules are 3.3v compatible.  If your device appears to be working but is returning nonsensical values, make sure your VCC is 5v.
